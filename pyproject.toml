@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tabulatedockerps"
-version = "0.1.0"
+version = "0.1.1"
 description = "Script Python que formata em tabela a saída do `docker ps`"
 authors = ["viniciusccosta <viniciusccosta95@gmail.com>"]
 license = "MIT"
