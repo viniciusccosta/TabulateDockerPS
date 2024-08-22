@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "tabulatedockerps"
+version = "0.1.0"
+description = "Script Python que formata em tabela a saída do `docker ps`"
+authors = ["viniciusccosta <viniciusccosta95@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.12"
+tabulate = "^0.9.0"
+debugpy = "^1.8.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
