@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import re
 import sys
@@ -85,10 +87,14 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def entry_point():
     args = parse_arguments()
 
     if args.debug:
         enable_debug()
 
     main(args.format)
+
+
+if __name__ == "__main__":
+    entry_point()
