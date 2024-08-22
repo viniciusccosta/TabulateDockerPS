@@ -5,6 +5,9 @@ description = "Script Python que formata em tabela a saída do `docker ps`"
 authors = ["viniciusccosta <viniciusccosta95@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/viniciusccosta/TabulateDockerPS"
+repository = "https://github.com/viniciusccosta/TabulateDockerPS"
+keywords = ["docker", "tabulate", "command-line", "cli"]
 
 [tool.poetry.scripts]
 tdps = "tabulatedockerps.tdps:entry_point"
