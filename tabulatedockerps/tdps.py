@@ -3,9 +3,12 @@
 import argparse
 import re
 import sys
+import select
 
 import tabulate
 
+class NoInputException(Exception):
+    pass
 
 def validate_format(format):
     """Validate if the format is one of tabulate's available formats."""
@@ -17,15 +20,6 @@ def validate_format(format):
 
     return format
 
-
-def enable_debug():
-    import debugpy
-
-    debugpy.listen(("localhost", 5678))
-    print("Waiting for debugger to attach...")
-    debugpy.wait_for_client()
-
-
 def format_ports_column(port_mappings):
     """Splits port mappings into separate lines if they exist."""
     return "\n".join(port_mappings.split(", ")) if port_mappings else ""
@@ -36,11 +30,12 @@ def process_docker_ps_output(lines):
     # Extract and process headers
     headers = re.sub(r"\s{2,}", "\t", lines[0]).strip().split("\t")
     indexes = [lines[0].index(header) for header in headers]
-
+    
     data = []
     for line in lines[1:]:
         columns = [
-            line[indexes[i] : indexes[i + 1]].strip() for i in range(len(indexes) - 1)
+            line[indexes[i]:indexes[i + 1]].strip() if i < len(indexes) - 1 else line[indexes[i]:].strip()
+            for i in range(len(indexes))
         ]
         formatted_columns = [
             (
@@ -57,17 +52,23 @@ def process_docker_ps_output(lines):
 
 
 def main(tablefmt="grid"):
-    # Step 1: Read the input from stdin
+    # TODO: What if we execute `docker ps` instead of piping the output?
+    
+    # Step 1: Check if there's input available on stdin
+    if not select.select([sys.stdin], [], [], 0.1)[0]:
+        # TODO: Add a check for the `docker ps` command
+        raise NoInputException()
+    
+    # Step 2: Read the input from stdin
     lines = sys.stdin.read().splitlines()
 
     if not lines:
-        print("No input received.")
-        sys.exit(1)
+        raise NoInputException()
 
-    # Step 2: Process the docker ps output
+    # Step 3: Process the docker ps output
     headers, data = process_docker_ps_output(lines)
 
-    # Step 3: Use `tabulate` to display the data
+    # Step 4: Use `tabulate` to display the data
     table = tabulate.tabulate(data, headers=headers, tablefmt=tablefmt)
     print(table)
 
@@ -75,25 +76,33 @@ def main(tablefmt="grid"):
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Process 'docker ps' output.",
-        usage="docker ps | python tdps.py [--debug] [--format FORMAT]",
+        usage="docker ps | tdps [--tablefmt TABLEFMT]",
     )
-    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    
+    # Get the list of available formats
+    available_formats = ", ".join(tabulate._table_formats.keys())
+    
     parser.add_argument(
-        "--format",
+        "--tablefmt",
         type=validate_format,
         default="grid",
-        help="Specify the output format",
+        help=f"Table format to use. Available formats: {available_formats}",
+        # choices=list(tabulate._table_formats.keys()),
+        
     )
-    return parser.parse_args()
+    
+    return parser
 
 
 def entry_point():
-    args = parse_arguments()
-
-    if args.debug:
-        enable_debug()
-
-    main(args.format)
+    parser = parse_arguments()
+    args = parser.parse_args()
+    
+    try:
+        main(tablefmt=args.tablefmt,)
+    except NoInputException:
+        parser.print_help()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
