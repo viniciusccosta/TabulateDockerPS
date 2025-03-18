@@ -1,7 +1,6 @@
 # TabulateDockerPS
 
 [![MIT License](https://img.shields.io/github/license/viniciusccosta/clipbarcode)](https://choosealicense.com/licenses/mit/)
-[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/downloads/release/python-3125/)
 
 TabulateDockerPS é um script Python que transforma a saída do comando docker ps em uma tabela formatada utilizando a biblioteca tabulate. Isso permite que a saída seja visualmente mais organizada e de fácil leitura. O script é simples de usar e pode ser instalado via pipx, tornando-o fácil de integrar em qualquer ambiente de desenvolvimento que utilize Docker.
 
@@ -16,7 +15,7 @@ pipx install tabulatedockerps
 Para utilizar o script, simplesmente redirecione a saída do comando `docker ps` para o script Python:
 
 ```bash
-docker ps | tdps [--debug] [--format FORMAT]
+docker ps | tdps [--tablefmt TABLEFMT]
 ```
 
 ## Exemplo de Saída
@@ -26,12 +25,12 @@ Ao executar o comando docker ps e passar a saída para o TabulateDockerPS, você
 ```bash
 $ docker ps | tdps
 
-+----------------+---------+--------------------------+----------------+---------------+------------------------+
-| CONTAINER ID   | IMAGE   | COMMAND                  | CREATED        | STATUS        | PORTS                  |
-+================+=========+==========================+================+===============+========================+
-| 874ace075081   | ubuntu  | "bash -c 'while true…"   | 37 minutes ago | Up 37 minutes | 0.0.0.0:8080->8080/tcp |
-|                |         |                          |                |               | 0.0.0.0:80->80/tcp     |
-+----------------+---------+--------------------------+----------------+---------------+------------------------+
++----------------+---------+--------------------------+----------------+---------------+------------------------+---------+
+| CONTAINER ID   | IMAGE   | COMMAND                  | CREATED        | STATUS        | PORTS                  | NAMES   |
++================+=========+==========================+================+===============+========================+=========+
+| 874ace075081   | ubuntu  | "bash -c 'while true…"   | 37 minutes ago | Up 37 minutes | 0.0.0.0:8080->8080/tcp | ubuntu  |
+|                |         |                          |                |               | 0.0.0.0:80->80/tcp     |         |
++----------------+---------+--------------------------+----------------+---------------+------------------------+---------+
 ```
 
 ## Formatos Suportados
