@@ -3,7 +3,6 @@
 import argparse
 import re
 import sys
-import select
 
 import tabulate
 
@@ -53,12 +52,11 @@ def process_docker_ps_output(lines):
 
 def main(tablefmt="grid"):
     # TODO: What if we execute `docker ps` instead of piping the output?
-    
-    # Step 1: Check if there's input available on stdin
-    if not select.select([sys.stdin], [], [], 0.1)[0]:
-        # TODO: Add a check for the `docker ps` command
+
+    # Step 1: Require piped input (avoid hanging waiting for interactive stdin)
+    if sys.stdin.isatty():
         raise NoInputException()
-    
+
     # Step 2: Read the input from stdin
     lines = sys.stdin.read().splitlines()
 
